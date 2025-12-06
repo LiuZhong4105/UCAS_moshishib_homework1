@@ -30,6 +30,11 @@ def generate_synthetic_data(n_samples=10000, n_features=784, n_classes=10, rando
     """
     Generate synthetic data for testing when MNIST is not available
     
+    Creates a more realistic and challenging synthetic dataset by:
+    - Using smaller separation between class means
+    - Adding higher within-class variance
+    - Including sparse features (mimicking image data)
+    
     Args:
         n_samples: Number of samples to generate
         n_features: Number of features
@@ -41,8 +46,9 @@ def generate_synthetic_data(n_samples=10000, n_features=784, n_classes=10, rando
     """
     np.random.seed(random_state)
     
-    # Generate class-specific means
-    class_means = np.random.randn(n_classes, n_features) * 2
+    # Generate class-specific means with smaller separation
+    # Reduced from 2 to 0.3 to create more overlap
+    class_means = np.random.randn(n_classes, n_features) * 0.3
     
     # Generate samples
     samples_per_class = n_samples // n_classes
@@ -50,8 +56,15 @@ def generate_synthetic_data(n_samples=10000, n_features=784, n_classes=10, rando
     y = []
     
     for i in range(n_classes):
-        # Generate samples from multivariate normal distribution
-        class_samples = np.random.randn(samples_per_class, n_features) + class_means[i]
+        # Generate samples with higher variance (multiplied by 2)
+        # This creates more within-class variability
+        class_samples = np.random.randn(samples_per_class, n_features) * 2 + class_means[i]
+        
+        # Add sparsity to mimic image data (many pixels are background)
+        # Randomly zero out 70% of features
+        mask = np.random.rand(samples_per_class, n_features) > 0.7
+        class_samples = class_samples * mask
+        
         X.append(class_samples)
         y.extend([i] * samples_per_class)
     
@@ -63,7 +76,7 @@ def generate_synthetic_data(n_samples=10000, n_features=784, n_classes=10, rando
     X = X[indices]
     y = y[indices]
     
-    # Normalize to [0, 1]
+    # Normalize to [0, 1] like real MNIST
     X = (X - X.min()) / (X.max() - X.min() + 1e-8)
     
     return X, y
