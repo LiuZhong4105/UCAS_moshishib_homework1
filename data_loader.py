@@ -150,7 +150,7 @@ def load_mnist(test_size=0.2, random_state=42, sample_size=None, use_synthetic=F
             try:
                 print("Trying to load from OpenML as fallback...")
                 from sklearn.datasets import fetch_openml
-                mnist = fetch_openml('mnist_784', version=1, as_frame=False, parser='auto')
+                mnist = fetch_openml('mnist_784', version=1, parser='auto')
                 X, y = mnist.data, mnist.target.astype(int)
                 
                 # Convert to numpy arrays if needed
@@ -183,8 +183,9 @@ def load_mnist(test_size=0.2, random_state=42, sample_size=None, use_synthetic=F
             )
         else:
             # Process the loaded MNIST data
-            # Sample if requested
-            if sample_size is not None and sample_size < len(X_train_full) + len(X_test_full):
+            # Sample if requested and smaller than full dataset
+            total_samples = len(X_train_full) + len(X_test_full)
+            if sample_size is not None and sample_size < total_samples:
                 # Combine train and test sets for sampling
                 X = np.vstack([X_train_full, X_test_full])
                 y = np.concatenate([y_train_full, y_test_full])
@@ -194,12 +195,12 @@ def load_mnist(test_size=0.2, random_state=42, sample_size=None, use_synthetic=F
                 X = X[indices]
                 y = y[indices]
                 
-                # Split into train and test sets
+                # Split into train and test sets with requested test_size ratio
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=test_size, random_state=random_state, stratify=y
                 )
             else:
-                # Use the predefined train/test split
+                # Use the predefined train/test split from MNIST (60k train / 10k test)
                 X_train, y_train = X_train_full, y_train_full
                 X_test, y_test = X_test_full, y_test_full
             
