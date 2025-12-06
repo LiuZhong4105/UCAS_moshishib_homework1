@@ -11,6 +11,9 @@ class QDF:
     Supports RDA (Regularized Discriminant Analysis) and MQDF (Modified Quadratic Discriminant Function)
     """
     
+    # Numerical stability constant
+    NUMERICAL_STABILITY_EPS = 1e-6
+    
     def __init__(self, reg_type='rda', alpha=0.5, beta=0.5, k_mqdf=None):
         """
         Args:
@@ -85,11 +88,11 @@ class QDF:
                     
                     # Reconstruct with reduced dimensionality
                     # Add small constant to remaining eigenvalues
-                    delta = np.mean(eigenvalues[self.k_mqdf:]) if self.k_mqdf < len(eigenvalues) else 1e-6
+                    delta = np.mean(eigenvalues[self.k_mqdf:]) if self.k_mqdf < len(eigenvalues) else self.NUMERICAL_STABILITY_EPS
                     cov_c = eigenvectors_k @ np.diag(eigenvalues_k) @ eigenvectors_k.T + delta * np.eye(n_features)
             
             # Add small regularization for numerical stability
-            self.covariances[c] = cov_c + 1e-6 * np.eye(n_features)
+            self.covariances[c] = cov_c + self.NUMERICAL_STABILITY_EPS * np.eye(n_features)
         
         return self
     

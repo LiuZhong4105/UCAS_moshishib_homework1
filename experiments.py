@@ -29,6 +29,10 @@ def run_experiments(dimensions=[10, 20, 30, 50, 100, 200], sample_size=10000):
     # Standardize data
     X_train, X_test = standardize_data(X_train, X_test)
     
+    # Calculate maximum LDA dimensions (n_classes - 1)
+    n_classes = len(np.unique(y_train))
+    max_lda_dims = n_classes - 1
+    
     results = {
         'dimensions': dimensions,
         'pca_qdf_rda': [],
@@ -51,7 +55,7 @@ def run_experiments(dimensions=[10, 20, 30, 50, 100, 200], sample_size=10000):
         print(f"{'=' * 80}")
         
         # Limit LDA dimensions to at most n_classes - 1
-        lda_dim = min(dim, 9)  # MNIST has 10 classes, so max 9 LDA components
+        lda_dim = min(dim, max_lda_dims)
         
         # PCA reduction
         print(f"\nApplying PCA with {dim} components...")
@@ -79,7 +83,8 @@ def run_experiments(dimensions=[10, 20, 30, 50, 100, 200], sample_size=10000):
         # Test PCA + QDF (MQDF)
         print("PCA + QDF (MQDF)...")
         start_time = time.time()
-        k_mqdf = max(5, dim // 2)  # Use half of dimensions for MQDF
+        MIN_MQDF_COMPONENTS = 5
+        k_mqdf = max(MIN_MQDF_COMPONENTS, dim // 2)  # Use half of dimensions for MQDF
         qdf_mqdf = QDF(reg_type='mqdf', k_mqdf=k_mqdf)
         qdf_mqdf.fit(X_train_pca, y_train)
         acc_pca_qdf_mqdf = qdf_mqdf.score(X_test_pca, y_test)
@@ -113,7 +118,8 @@ def run_experiments(dimensions=[10, 20, 30, 50, 100, 200], sample_size=10000):
         # Test LDA + QDF (MQDF)
         print("LDA + QDF (MQDF)...")
         start_time = time.time()
-        k_mqdf_lda = max(3, lda_dim // 2)
+        MIN_LDA_MQDF_COMPONENTS = 3
+        k_mqdf_lda = max(MIN_LDA_MQDF_COMPONENTS, lda_dim // 2)
         qdf_mqdf_lda = QDF(reg_type='mqdf', k_mqdf=k_mqdf_lda)
         qdf_mqdf_lda.fit(X_train_lda, y_train)
         acc_lda_qdf_mqdf = qdf_mqdf_lda.score(X_test_lda, y_test)
