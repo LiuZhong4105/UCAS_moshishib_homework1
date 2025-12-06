@@ -149,7 +149,7 @@ python main.py --dimensions 5 10 20 30 50 100 150 200 --sample-size 30000
 
 ### Q: 无法下载MNIST数据？
 
-A: 使用demo.py运行合成数据实验，或手动下载MNIST并使用本地加载。
+A: 程序会自动尝试从TensorFlow/Keras下载MNIST数据，如果失败会尝试OpenML。如果两者都失败，程序会自动使用合成数据。你也可以使用demo.py直接运行合成数据实验。
 
 ### Q: 内存不足？
 

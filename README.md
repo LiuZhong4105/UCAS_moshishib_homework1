@@ -114,9 +114,19 @@ python main.py --no-viz
 - 使用scikit-learn的KNN
 - KD树加速最近邻搜索
 
+## 数据来源
+
+程序会自动从以下来源下载MNIST数据集：
+1. **主要来源**: TensorFlow/Keras数据集 (https://www.tensorflow.org/datasets/catalog/mnist)
+   - 训练集: 60,000 样本
+   - 测试集: 10,000 样本
+2. **备用来源**: OpenML (如果TensorFlow下载失败)
+3. **合成数据**: 如果网络不可用，程序会自动生成合成数据用于测试
+
 ## 参考文献
 
 - MNIST数据集: http://yann.lecun.com/exdb/mnist/
+- TensorFlow Datasets: https://www.tensorflow.org/datasets/catalog/mnist
 - Friedman, J. H. (1989). Regularized Discriminant Analysis
 - Kimura, F., et al. (1987). Modified Quadratic Discriminant Functions
 
